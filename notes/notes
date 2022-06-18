@@ -1,0 +1,119 @@
+Stack has been installed to: /usr/local/bin/stack
+
+WARNING: '/home/youqin/.local/bin' is not on your PATH.
+    Stack will place the binaries it builds in '/home/youqin/.local/bin' so
+    for best results, please add it to the beginning of PATH in your profile.
+
+
+youqin@youqin-Latitude-7490:~$ export PATH="/usr/local/bin:$PATH"
+
+
+youqin@youqin-Latitude-7490:~$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin
+
+
+
+youqin@youqin-Latitude-7490:~/Downloads/CSM_HU/haskell$ stack ghci
+
+Note: No local targets specified, so a plain ghci will be started with no package hiding or package
+      options.
+      
+      You are using snapshot: lts-19.10
+      
+      If you want to use package hiding and options, then you can try one of the following:
+      
+      * If you want to start a different project configuration
+        than /home/youqin/.stack/global-project/stack.yaml, then you can use stack init to create a
+        new stack.yaml for the packages in the current directory. 
+        
+      * If you want to use the project configuration
+        at /home/youqin/.stack/global-project/stack.yaml, then you can add to its 'packages' field.
+      
+Configuring GHCi with the following packages: 
+GHCi, version 9.0.2: https://www.haskell.org/ghc/  :? for help
+Loaded GHCi configuration from /tmp/haskell-stack-ghci/2a3bbd58/ghci-script
+
+
+What is the Haskell equivalent of the C/Java/Python expression combine(prettify(lawn),construct(house,concrete))?
+
+combine (prettify lawn) (construct house concrete)
+
+
+What is the C/Java/Python equivalent of the Haskell expression send metric (double population + increase)?
+send(metric,double(population)+increase)
+
+
+
+
+
+
+
+
+***********************************************************************
+to start ghci(write code in terminal to run) : stack ghci
+***********************************************************************
+to run a hs file: stack runhaskell Gold.hs
+***********************************************************************
+load a hs file: ghci> :load Example.hs 
+reload the loaded file: reload
+***********************************************************************
+run the function in the file: ghci> polynomial 3.0
+***********************************************************************
+
+
+
+module Gold where
+
+-- The golden ratio
+phi :: Double
+phi = (sqrt 5 + 1) / 2  => 1.618
+
+polynomial :: Double -> Double
+polynomial x = x^2 - x - 1
+
+f x = polynomial (polynomial x)
+
+main = do
+  print (polynomial phi) => -0.0
+  print (f phi) => -1
+
+
+***********************************************************************
+use ; to separate lines, 
+or use the special :{ :}  to paste a block of code
+***********************************************************************
+
+Prelude> :{
+Prelude| polynomial :: Double -> Double
+Prelude| polynomial x = x^2 - x - 1
+Prelude| :}
+Prelude> polynomial 3.0
+5.0
+
+ghci> :{
+ghci| p x = x^2 - x - 1
+ghci| :}
+ghci> p 3
+5
+
+
+***********************************************************************
+`div` function does integer division
+/ operator performs the usual division
+***********************************************************************
+ghci>  7 `div` 2
+3
+ghci> 7/2
+3.5
+
+***********************************************************************
+if ... then .. else
+***********************************************************************
+
+ghci> :{
+ghci| login user password = if user == "unicorn73"
+ghci|                       then if password == "f4bulous!"
+ghci|                            then "unicorn73 logged in"
+ghci|                            else "wrong password"
+ghci|                       else "unknown user"
+ghci| :}
