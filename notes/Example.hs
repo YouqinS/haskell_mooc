@@ -1,6 +1,9 @@
 module Example where
 
 import Data.List
+import qualified Data.Map as Map --Data.Map contains some function with the same names as Prelude functions, the namespace needs to be imported qualified
+import Data.Array
+
 
 polynomial :: Double -> Double
 polynomial x = x^2 - x - 1
@@ -405,7 +408,7 @@ substringsOfLength :: Int -> String -> [String]
 substringsOfLength n string = map shorten (tails string)
   where shorten s = take n s
 
- 
+
 -- ghci> tails "hello"
 -- ["hello","ello","llo","lo","o",""]
 
@@ -762,7 +765,7 @@ a +++ b = a ++ " " ++ b
 
 
 keepElements :: [a] -> [Bool] -> [a]
-keepElements xs bs = map fst (zip xs bs) 
+keepElements xs bs = map fst (zip xs bs)
 -- ghci> zip [5,6,7,8] [True,False,True,False]
 -- [(5,True),(6,False),(7,True),(8,False)]
 
@@ -788,3 +791,286 @@ fsnd (_:x:_) = x  -- Returns the second element of a list
 
 -- ghci> fsnd [1,2,3,4,5]
 -- 2
+
+-----------------------------------------------
+-- Tuples
+
+-- zip :: [a] -> [b] -> [(a, b)]    -- two lists to list of pairs
+-- unzip :: [(a, b)] -> ([a], [b])  -- list of pairs to pair of lists
+-- partition :: (a -> Bool) -> [a] -> ([a], [a])    -- elements that satisfy and don't satisfy a predicate
+
+
+-- ghci> zip [1,2,3] [True,False,True]
+-- [(1,True),(2,False),(3,True)]
+
+-- ghci> unzip [(1,True),(2,False),(3,True)]
+-- ([1,2,3],[True,False,True])
+
+-- ghci> partition (>0) [-1,1,-4,3,2,0]
+-- ([1,3,2],[-1,-4,0])
+
+
+swap :: (a,b) -> (b,a)
+swap (x,y) = (y,x)
+
+
+-- sum all numbers that are paired with True
+sumIf :: [(Bool,Int)] -> Int
+sumIf [] = 0
+sumIf ((True,x):xs) = x + sumIf xs
+sumIf ((False,_):xs) = sumIf xs
+
+-- ghci> sumIf [(True,1),(False,10),(True,100)]
+-- 101
+
+{- 
+sumNumbers :: [Int] -> Int
+sumNumbers [] = 0
+sumNumbers (x:xs) = x + sumNumbers xs
+ -}
+
+
+-- sumNumbers xs == foldr (+) 0 xs
+
+
+ {- 
+myMaximum :: [Int] -> Int
+myMaximum [] = 0
+myMaximum (x:xs) = go x xs
+  where go biggest [] = biggest
+        go biggest (x:xs) = go (max biggest x) xs
+ -}
+
+
+
+ {- 
+countNothings :: [Maybe a] -> Int
+countNothings [] = 0
+countNothings (Nothing : xs) = 1 + countNothings xs
+countNothings (Just _  : xs) = countNothings xs
+ -}
+
+{- 
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f y []     = y
+foldr f y (x:xs) = f x (foldr f y xs)
+ -}
+
+
+{- 
+f :: (Int -> Int) -> Int -> Bool
+f g x = x == g x 
+-}
+
+
+{- f :: (Eq a) => (a -> a) -> a -> Bool  -- type Ea is needed to use operator ==
+f g x = x == g x
+-}
+
+-- type Ea is needed to use operator ==
+-- Prelude> f g x = x == g x
+-- Prelude> :type f
+-- f :: (Eq a) => (a -> a) -> a -> Bool
+
+-- multiple constraints:
+bothPairsEqual :: (Eq a, Eq b) => a -> a -> b -> b -> Bool
+bothPairsEqual left1 left2 right1 right2 = left1 == left2 && right1 == right2
+
+-- ghci> bothPairsEqual True True False True
+-- False
+-- ghci> bothPairsEqual True True False False
+-- True
+-- ghci> bothPairsEqual 1 1 2 1
+-- False
+-- ghci> bothPairsEqual 1 1 2 2
+-- True
+
+-- ghci> nub [3,5,3,1,1]  -- eliminates duplicates
+-- [3,5,1]
+
+
+-- ghci> compare 1 1
+-- EQ
+-- ghci> compare 1 3
+-- LT
+-- ghci> compare 4 3
+-- GT
+
+-- ghci> min 1 2 
+-- 1
+
+-- ghci> max 1 2
+-- 2
+
+-- strings are compared alphabetically
+-- ghci> "aardvark" < "banana"   
+-- True
+-- ghci> "aardvark" < "aanana"
+-- False
+
+-- ghci> [2,2,3] > [2,5]
+-- False
+-- ghci> [3,2,3] > [2,5]
+-- True
+
+-- ghci> sort [6,1,4,8,2]
+-- [1,2,4,6,8]
+
+-- ghci> sort "black sphinx of quartz, judge my vow!"
+-- "      !,aabcdefghijklmnoopqrstuuvwxyz"
+
+
+
+-- from the module Data.List
+-- sorts a list using the given comparison function
+-- sortBy :: (a -> a -> Ordering) -> [a] -> [a]
+
+-- from the module Data.Ord
+-- compares two values "through" the function f
+comparing :: (Ord a) => (b -> a) -> b -> b -> Ordering
+comparing f x y = compare (f x) (f y)
+
+-- sorts lists by their length
+sortByLength :: [[a]] -> [[a]]
+sortByLength = sortBy (comparing length)
+
+-- ghci> sortByLength [[1,2,3],[4,5],[4,5,6,7]]
+-- [[4,5],[1,2,3],[4,5,6,7]]
+
+{- 
+  (+) :: Num a => a -> a -> a
+  (-) :: Num a => a -> a -> a
+  (*) :: Num a => a -> a -> a
+  negate :: Num a => a -> a    -- 0-x
+  abs :: Num a => a -> a       -- absolute value
+  signum :: Num a => a -> a    -- -1 for negative values, 0 for 0, +1 for positive values
+  fromInteger :: Num a => Integer -> a 
+-}
+
+-- ghci> signum 0
+-- 0
+-- ghci> signum 11
+-- 1
+-- ghci> signum (-11)
+-- -1
+
+-- ghci> negate 1
+-- -1
+-- ghci> negate (-1)
+-- 1
+
+-- ghci> show [3]
+-- "[3]"
+-- ghci> show [2,3]
+-- "[2,3]"
+-- ghci> show 3
+-- "3"
+
+-- ghci> read "3" :: Int
+-- 3
+-- ghci> read "3" :: Double 
+-- 3.0
+
+{- 
+  foldr (+) 1 Nothing   ==> 1
+  foldr (+) 1 (Just 3)  ==> 4
+  length Nothing        ==> 0
+  length (Just 'a')     ==> 1
+-}
+
+
+-- Map
+{- 
+  -- Create a Map from a list of key-value pairs
+  Map.fromList :: Ord k => [(k, a)] -> Map.Map k a
+
+  -- Insert a value into a map. Overrides any previous value with the same key.
+  -- Returns a new map. Does not mutate the given map.
+  Map.insert :: Ord k => k -> a -> Map.Map k a -> Map.Map k a
+
+  -- Get a value from a map using a key. Returns Nothing if the key was not present in the map.
+  Map.lookup :: Ord k => k -> Map.Map k a -> Maybe a
+
+  -- An empty map
+  Map.empty :: Map.Map k a
+-}
+
+{- 
+  ghci> values = Map.fromList [("z",3),("w",4)]
+  ghci> Map.lookup "z" values
+  Just 3
+  ghci> Map.lookup "banana" values
+  Nothing
+  ghci> Map.insert "x" 7 values
+  fromList [("w",4),("x",7),("z",3)]
+  ghci> values
+  fromList [("w",4),("z",3)] -- original Map not changed, immutability
+  ghci> Map.insert "x" 1 (Map.insert "y" 2 values) 
+  fromList [("w",4),("x",1),("y",2),("z",3)] -- two insertions
+-}
+
+withdraw :: String -> Int -> Map.Map String Int -> Map.Map String Int
+withdraw account amount bank =
+  case Map.lookup account bank of
+    Nothing  -> bank                                   -- account not found, no change
+    Just sum -> Map.insert account (sum-amount) bank   -- set new balance
+
+
+-- ghci> bank = Map.fromList [("Bob",100),("Mike",50)]
+-- ghci> withdraw "Bob" 80 bank
+-- fromList [("Bob",20),("Mike",50)]
+
+-- ghci> bank
+-- fromList [("Bob",100),("Mike",50)] -- note immutability
+
+-- ghci> withdraw "Bozo" 1000 bank --key not found
+-- fromList [("Bob",100),("Mike",50)]
+
+
+withdraw1 :: String -> Int -> Map.Map String Int -> Map.Map String Int
+withdraw1 account amount = Map.adjust (\x -> x-amount) account
+--withdraw1 account amount bank = Map.adjust (\x -> x-amount) account bank
+
+
+-- ghci> bank = Map.fromList [("Bob",100),("Mike",50)]
+-- ghci> withdraw1 "Bob" 80 bank
+-- fromList [("Bob",20),("Mike",50)]
+-- ghci> bank
+-- fromList [("Bob",100),("Mike",50)]
+
+
+-- Data.Array
+-- array :: Ix i => (i, i) -> [(i, e)] -> Array i e
+
+myArray :: Array Int String
+myArray = array (7,11) [(7,"seven"), (8,"eight"), (9,"nine"), (10,"ten"), (11,"ELEVEN")]
+
+-- listArray :: Ix i => (i, i) -> [e] -> Array i e
+
+myArray1 :: Array Int String
+myArray1 = listArray (7,11) ["seven", "eight", "nine", "ten", "ELEVEN"]
+
+
+{- Arrays are used with two new operators:
+  Array lookup
+  (!) :: Ix i => Array i e -> i -> e
+  -- Array update
+  (//) :: Ix i => Array i e -> [(i, e)] -> Array i e 
+-}
+
+-- ghci> myArray = listArray (7,11) ["seven", "eight", "nine", "ten", "ELEVEN"]
+-- ghci> myArray
+-- array (7,11) [(7,"seven"),(8,"eight"),(9,"nine"),(10,"ten"),(11,"ELEVEN")]
+
+-- ghci> myArray ! 8          -- get by index
+-- "eight"
+-- ghci> myArray // [(8,"ocho"),(9,"nueve")]    -- update by index, returns new array
+-- array (7,11) [(7,"seven"),(8,"ocho"),(9,"nueve"),(10,"ten"),(11,"ELEVEN")]
+-- ghci> myArray
+-- array (7,11) [(7,"seven"),(8,"eight"),(9,"nine"),(10,"ten"),(11,"ELEVEN")]  --immutability
+
+-- ghci> length (array (7,11) [(7,"seven"),(8,"eight"),(9,"nine"),(10,"ten"),(11,"ELEVEN")])
+-- 5
+-- ghci> foldr (+) 0 (Map.fromList [("banana",3),("egg",7)])
+-- 10
+
