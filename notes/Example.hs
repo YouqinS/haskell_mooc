@@ -1062,7 +1062,7 @@ myArray1 = listArray (7,11) ["seven", "eight", "nine", "ten", "ELEVEN"]
 -- ghci> myArray
 -- array (7,11) [(7,"seven"),(8,"eight"),(9,"nine"),(10,"ten"),(11,"ELEVEN")]
 
--- ghci> myArray ! 8          -- get by index
+-- ghci> myArray ! 8          -- get by index/key?
 -- "eight"
 -- ghci> myArray // [(8,"ocho"),(9,"nueve")]    -- update by index, returns new array
 -- array (7,11) [(7,"seven"),(8,"ocho"),(9,"nueve"),(10,"ten"),(11,"ELEVEN")]
