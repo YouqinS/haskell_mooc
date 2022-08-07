@@ -532,6 +532,17 @@ between lo high x = x < high && x > lo
 -- ghci> head $ reverse "abcd"
 -- 'd'
 
+-- putStrLn (show (1 + 1))
+-- putStrLn (show $ 1 + 1)
+-- putStrLn $ show (1 + 1)
+-- putStrLn $ show $ 1 + 1
+
+
+-- ($) is help avoid parentheses. 
+-- (.) is for composing two functions together to make a new function
+
+
+
 -- ghci> reverse (map head (map reverse (["Haskell","pro"] ++ ["dodo","lyric"])))
 -- "cool"
 -- ghci> (reverse . map head . map reverse) (["Haskell","pro"] ++ ["dodo","lyric"])
@@ -1074,3 +1085,180 @@ myArray1 = listArray (7,11) ["seven", "eight", "nine", "ten", "ELEVEN"]
 -- ghci> foldr (+) 0 (Map.fromList [("banana",3),("egg",7)])
 -- 10
 
+
+
+-- Datatypes
+
+-- definition of a type with three values
+data Color = Red | Green | Blue
+
+-- a function that uses pattern matching on our new type
+rgb :: Color -> [Double]
+rgb Red = [1,0,0]
+rgb Green = [0,1,0]
+rgb Blue = [0,0,1]
+
+-- ghci> :t Red
+-- Red :: Color
+-- ghci> :t [Red,Blue,Green]
+-- [Red,Blue,Green] :: [Color]
+-- ghci> rgb Red
+-- [1.0,0.0,0.0]
+
+
+data Report = ConstructReport Int String String
+-- ghci>  :t ConstructReport 1 "Title" "This is the body."
+-- ConstructReport 1 "Title" "This is the body." :: Report
+
+reportContent :: Report -> String
+reportContent (ConstructReport id title content) = content
+
+setReportContent :: Report -> String -> Report
+setReportContent (ConstructReport id title content) ctnt =  ConstructReport id title ctnt
+-- setReportContent (ConstructReport id title content) = ConstructReport id title
+
+--  r = ConstructReport 1 "Title" ""
+-- ghci> :t (setReportContent r "?")
+-- (setReportContent r "?") :: Report
+-- ghci> show $ reportContent $ setReportContent r "Body"
+-- "\"Body\""
+
+
+-- to print self-defined types, just add a deriving Show after the type definition:
+data Card = Joker | Heart Int | Club Int | Spade Int | Diamond Int  deriving Show
+
+-- ghci> map Heart [1,2,3]
+-- [Heart 1,Heart 2,Heart 3]
+-- ghci> (Heart . (\x -> x+1)) 1
+-- Heart 2
+
+
+data Described a = Describe a String
+
+getValue :: Described a -> a
+getValue (Describe x _) = x
+
+getDescription :: Described a -> String
+getDescription (Describe _ desc) = desc
+
+-- ghci> getValue (Describe 3 "a number")
+-- 3
+-- ghci> getDescription (Describe 3 "a number")
+-- "a number"
+
+
+---------------------------------------------------------
+-- data IntList = Empty | Node Int IntList
+--   deriving Show
+
+-- ihead :: IntList -> Int
+-- ihead (Node i _) = i
+
+-- itail :: IntList -> IntList
+-- itail (Node _ t) = t
+
+-- ilength :: IntList -> Int
+-- ilength Empty = 0
+-- ilength (Node _ t) = 1 + ilength t
+
+-- ghci> ihead (Node 3 (Node 5 (Node 4 Empty)))
+-- 3
+-- ghci> itail (Node 3 (Node 5 (Node 4 Empty)))
+-- Node 5 (Node 4 Empty)
+-- ghci> ilength (Node 3 (Node 5 (Node 4 Empty)))
+-- 3
+---------------------------------------------------------
+
+
+-- to put any type of element in our list,
+data List a = Empty | Node a (List a)
+  deriving Show
+
+lhead :: List a -> a
+lhead (Node h _) = h
+
+ltail :: List a -> List a
+ltail (Node _ t) = t
+
+lnull :: List a -> Bool
+lnull Empty = True
+lnull _     = False
+
+llength :: List a -> Int
+llength Empty = 0
+llength (Node _ t) = 1 + llength t
+
+-- ghci> lhead (Node 3 (Node 5 (Node 4 Empty)))
+-- 3
+-- ghci> ltail  (Node 3 (Node 5 (Node 4 Empty)))
+-- Node 5 (Node 4 Empty)
+-- ghci> lnull   (Node 3 (Node 5 (Node 4 Empty)))
+-- False
+-- ghci> length (Node 3 (Node 5 (Node 4 Empty)))
+-- ghci> llength (Node 3 (Node 5 (Node 4 Empty)))
+-- 3
+
+-- ghci> llength (Node "a" (Node "b" (Node "c" Empty)))
+-- 3
+-- ghci> lhead  (Node "a" (Node "b" (Node "c" Empty)))
+-- "a"
+-- ghci> ltail  (Node "a" (Node "b" (Node "c" Empty)))
+-- Node "b" (Node "c" Empty)
+-- ghci> lnull Empty
+-- True
+
+
+---------------------------------------------------------
+--Tree
+---------------------------------------------------------
+-- data Tree a = Node a (Tree a) (Tree a) | Empty
+-- example :: Tree Int
+-- example = (Node 0 (Node 1 (Node 2 Empty Empty)
+--                           (Node 3 Empty Empty))
+--                   (Node 4 Empty Empty))
+
+-- treeHeight :: Tree a -> Int
+-- treeHeight Empty = 0
+-- treeHeight (Node _ l r) = 1 + max (treeHeight l) (treeHeight r)
+
+-- treeHeight Empty ==> 0
+-- treeHeight (Node 2 Empty Empty)
+--   ==> 1 + max (treeHeight Empty) (treeHeight Empty)
+--   ==> 1 + max 0 0
+--   ==> 1
+-- treeHeight (Node 1 Empty (Node 2 Empty Empty))
+--   ==> 1 + max (treeHeight Empty) (treeHeight (Node 2 Empty Empty))
+--   ==> 1 + max 0 1
+--   ==> 2
+-- treeHeight (Node 0 (Node 1 Empty (Node 2 Empty Empty)) Empty)
+--   ==> 1 + max (treeHeight (Node 1 Empty (Node 2 Empty Empty))) (treeHeight Empty)
+--   ==> 1 + max 2 0
+--   ==> 3
+---------------------------------------------------------
+
+-- data Person = MkPerson String Int String String String deriving Show
+data Person = MkPerson { name :: String, age :: Int, town :: String, state :: String, profession :: String}
+  deriving Show
+
+-- ghci> MkPerson "Jane"  21 "Espoo" "Espoo" "Teacher" 
+-- MkPerson {name = "Jane", age = 21, town = "Espoo", state = "Espoo", profession = "Teacher"} 
+
+-- ghci> MkPerson {name = "Jane Doe", town = "Houston", profession = "Engineer", state = "Texas", age = 21}
+-- MkPerson {name = "Jane Doe", age = 21, town = "Houston", state = "Texas", profession = "Engineer"}
+
+
+people :: [Person]
+people = [ MkPerson "Jane Doe" 21 "Houston" "Texas" "Engineer"
+         , MkPerson "Maija Meiken" 35 "Rovaniemi" "Finland" "Engineer"
+         , MkPerson "Mauno Mutikainen" 27 "Turku" "Finland" "Mathematician"
+         ]
+
+query :: [Person] -> [Person]
+query []     = []
+query (x:xs)
+  | state x == "Finland" && profession x == "Engineer" =
+      x : query xs
+  | otherwise = query xs
+
+-- ghci> query people 
+-- [MkPerson {name = "Maija Meiken", age = 35, town = "Rovaniemi", state = "Finland", profession = "Engineer"}]
