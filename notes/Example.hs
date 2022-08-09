@@ -1262,3 +1262,47 @@ query (x:xs)
 
 -- ghci> query people 
 -- [MkPerson {name = "Maija Meiken", age = 35, town = "Rovaniemi", state = "Finland", profession = "Engineer"}]
+
+
+-----------------------------
+--Part 6--
+-----------------------------
+-- class Size a where
+--   size :: a -> Int
+
+-- instance Size Int where
+--   size x = abs x
+
+-- instance Size [a] where
+--   size xs = length xs
+
+-- ghci> :t size 
+-- size :: Size a => a -> Int
+-- ghci> size [1,2]
+-- 2
+-- ghci> size [""]
+-- 1
+
+-- sizeBoth :: (Size a1, Size a2) => a1 -> a2 -> [Int]
+-- sizeBoth a b = [size a, size b]
+-- ghci> :t sizeBoth
+-- sizeBoth :: (Size a1, Size a2) => a1 -> a2 -> [Int]
+
+
+class Size a where
+  empty :: a
+  size :: a -> Int
+  sameSize :: a -> a -> Bool
+
+instance Size (Maybe a) where
+  empty = Nothing
+
+  size Nothing = 0
+  size (Just a) = 1
+
+  sameSize x y = size x == size y
+
+instance Size [a] where
+  empty = []
+  size xs = length xs
+  sameSize x y = size x == size y
