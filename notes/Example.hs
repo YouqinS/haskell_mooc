@@ -1306,3 +1306,139 @@ instance Size [a] where
   empty = []
   size xs = length xs
   sameSize x y = size x == size y
+
+
+-----------------------------
+--Part 7--
+-----------------------------
+
+data Money = Money Int
+  deriving Show
+
+renderMoney :: Money -> String
+renderMoney (Money cents) = show (fromIntegral cents / 100)
+
+(+!) :: Money -> Money -> Money
+(Money a) +! (Money b) = Money (a+b)
+
+scale :: Money -> Double -> Money
+scale (Money a) x = Money (round (fromIntegral a * x))
+
+addVat :: Money -> Money
+addVat m = m +! scale m 0.24
+
+-- ghci> renderMoney (Money 100 +! Money 150)
+-- "2.5"
+-- ghci> scale (Money 100) 0.5
+-- Money 50
+-- ghci> addVat (Money 100)
+-- Money 124
+
+
+data Person1 = Person1 {name1 :: String, age1 :: Int}
+  deriving Show
+
+data SortOrder = Ascending | Descending
+data SortField = Name | Age
+
+sortByField :: SortField -> [Person1] -> [Person1]
+sortByField Name ps = sortBy (comparing name1) ps
+sortByField Age ps = sortBy (comparing age1) ps
+
+sortPersons :: SortField -> SortOrder -> [Person1] -> [Person1]
+sortPersons field Ascending ps = sortByField field ps
+sortPersons field Descending ps = reverse (sortByField field ps)
+
+persons = [Person1 "Fridolf" 73, Person1 "Greta" 60, Person1 "Hans" 65]
+-- ghci> sortPersons Name Descending persons  
+-- [Person1 {name1 = "Hans", age1 = 65},Person1 {name1 = "Greta", age1 = 60},Person1 {name1 = "Fridolf", age1 = 73}]
+
+-- infix constructor: ist constructor (:). Any operator that begins with a colon (the : character) can be used as an infix constructor. We can pattern match on (:|) just like on (:)
+data NonEmpty a = a :| [a] deriving Show
+nonEmpty :: [a] -> Maybe (NonEmpty a)
+nonEmpty [] = Nothing
+nonEmpty (x:xs) = Just (x :| xs)
+
+toList :: NonEmpty a -> [a]
+toList (x :| xs) = x : xs
+-- ghci> nonEmpty []
+-- Nothing
+-- ghci> nonEmpty [1]
+-- Just (1 :| [])
+-- ghci> nonEmpty [1,2]
+-- Just (1 :| [2])
+neHead :: NonEmpty a -> a
+neHead (x :| _) = x
+neLast :: NonEmpty a -> a
+neLast (x :| []) = x
+neLast (_ :| xs) = last xs
+-- ghci> neHead (1:|[])
+-- 1
+-- ghci> neLast  (1:|[])
+-- 1
+-- ghci> neLast  (1:|[2])
+-- 2
+
+-- data Sum a = Sum a
+-- instance Num a => Semigroup (Sum a) where
+--   Sum a <> Sum b  =  Sum (a+b)
+
+-- data Product a = Product a
+-- instance Num a => Semigroup (Product a) where
+--   Product a <> Product b   =  Product (a*b)
+
+
+-- class Semigroup a => Monoid a where
+--   -- The neutral element
+--   mempty :: a
+
+
+-- class Semigroup a where
+--   -- | An associative operation.
+--   (<>) :: a -> a -> a
+
+  -- Combine elements of a nonempty list with <>
+  -- sconcat :: NonEmpty a -> a
+  -- sconcat as = ... -- default implementation omitted
+
+  -- Combine a value with itself using <>, n times
+  -- stimes :: Integral b => b -> a -> a
+  -- stimes n x = ... -- default implementation omitted
+
+
+-- data Vehicle = Car String | Airplane String
+
+-- sound :: Vehicle -> String
+-- sound (Car _) = "brum brum"
+-- sound (Airplane _) = "zooooom"
+
+
+data Car = Car String
+data Airplane = Airplane String
+
+class VehicleClass a where
+  sound :: a -> String
+
+instance VehicleClass Car where
+  sound (Car _) = "brum brum"
+
+instance VehicleClass Airplane where
+  sound (Airplane _) = "zooooom"
+
+
+data Discount = DiscountPercent Int         -- A percentage discount
+              | DiscountConstant Int        -- A constant discount
+              | MinimumPrice Int            -- Set a minimum price
+              | ForCustomer String Discount -- Discounts can be conditional
+              | Many [Discount]             -- Apply a number of discounts in row
+
+applyDiscount :: String -> Int -> Discount -> Int
+applyDiscount _        price (DiscountPercent percent) = price - (price * percent) `div` 100
+applyDiscount _        price (DiscountConstant discount) = price - discount
+applyDiscount _        price (MinimumPrice minPrice) = max price minPrice
+applyDiscount customer price (ForCustomer target discount)
+    | customer == target  = applyDiscount customer price discount
+    | otherwise           = price
+applyDiscount customer price (Many discounts) = go price discounts
+  where go p [] = p
+        go p (d:ds) = go (applyDiscount customer p d) ds
