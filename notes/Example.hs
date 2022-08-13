@@ -1442,3 +1442,47 @@ applyDiscount customer price (ForCustomer target discount)
 applyDiscount customer price (Many discounts) = go price discounts
   where go p [] = p
         go p (d:ds) = go (applyDiscount customer p d) ds
+
+
+
+-- Part 8 
+
+printTwoThings :: IO ()
+printTwoThings = do
+  putStrLn "Hello!"
+  putStrLn "How are you?"
+
+greet :: IO ()
+greet = do
+  putStrLn "What's your name?"
+  name <- getLine
+  putStrLn ("Hello, " ++ name)
+
+-- ghci> printTwoThings 
+-- Hello!
+-- How are you?
+-- ghci> greet 
+-- What's your name?
+-- m^?
+-- Hello, m
+-- ghci> 
+
+printAndIncrement :: Int -> Int
+printAndIncrement x = x+1
+  where action = putStrLn "got a number!"
+
+
+-- module Gold where
+
+-- -- The golden ratio
+-- phi :: Double
+-- phi = (sqrt 5 + 1) / 2
+
+-- polynomial :: Double -> Double
+-- polynomial x = x^2 - x - 1
+
+-- f x = polynomial (polynomial x)
+
+-- main = do
+--   print (polynomial phi)
+--   print (f phi)
